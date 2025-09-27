@@ -1782,7 +1782,68 @@ endmodule
 
 ✅ Fix: Swap order or use non-blocking assignment.
 
+### Simulation
 <br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-31-41" src="https://github.com/user-attachments/assets/e52acaf6-2282-4773-8b74-54096df52e7a" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-31-28" src="https://github.com/user-attachments/assets/ab81a3b6-ba29-4b3d-841f-d39b1ce13afb" />
+
+
+
+<br>
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-33-51" src="https://github.com/user-attachments/assets/640dfc21-ca3a-4391-86ce-57a9c4255dc6" />
+
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-33-45" src="https://github.com/user-attachments/assets/797408c9-ae69-43d2-9d06-c543eee6d0e5" />
+
+
+
+<br>
+
+### Netlist
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-34-32" src="https://github.com/user-attachments/assets/f403528b-872b-4969-bc02-2922d4766d68" />
+
+
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-34-20" src="https://github.com/user-attachments/assets/655fb98f-1df7-494e-b360-3d5da1fc48c4" />
+
+
+
+<br>
+
+### Gate Level Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-35-39" src="https://github.com/user-attachments/assets/2155d8b6-02e4-47c5-8061-65a93534cd01" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-35-31" src="https://github.com/user-attachments/assets/c1940254-2ce1-49fb-93bf-7850561287b5" />
+
+
+<br>
+
+### Comparision-Blocking Statement Caveat
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-25 23-36-09" src="https://github.com/user-attachments/assets/0dc23776-21b5-4c26-905f-90d618e916c4" />
+
+<br>
+
 
 
 ### ✅ Key Takeaways – Day 3
