@@ -303,6 +303,7 @@ Slow cells prevent **early data arrival**; fast cells maintain **overall perform
 <br>
 
 ### 4️⃣ Labs – Day 1
+
 #### Clone the Workshop Repository 🛠️
 
 To start the lab, first clone the workshop repository from GitHub:
@@ -682,7 +683,9 @@ write_verilog dff_asyncres_syn.v
 
 ### 1. Async Set
 #### Simulation
+
 <br>
+
 <img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-31-36" src="https://github.com/user-attachments/assets/724aa368-9814-4195-b6c7-c282e9555a26" />
 
 <br>
@@ -691,6 +694,7 @@ write_verilog dff_asyncres_syn.v
 <br>
 
 #### Synthesis
+
 <br>
 <img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-46-51" src="https://github.com/user-attachments/assets/7fd6d7fa-fa84-43af-bef0-7aefcab96caf" />
 
@@ -699,7 +703,9 @@ write_verilog dff_asyncres_syn.v
 <img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-46-58" src="https://github.com/user-attachments/assets/beca812f-3e51-4779-936c-01b583ba8c98" />
 
 <br>
+
 ### 2. Sync reset
+
 #### Simulation
 <br>
 <img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-35-34" src="https://github.com/user-attachments/assets/4cc44c40-1b70-4224-94d5-1f4d3b894b0e" />
@@ -901,6 +907,7 @@ endmodule
 * Synthesis recognises constant `1` and optimises into **OR gate**.
 
 ### Synthesis 
+
 <br>
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-20-54" src="https://github.com/user-attachments/assets/ff0c7bdf-c004-4419-9508-94bcafdabb12" />
