@@ -1901,16 +1901,413 @@ endmodule
 
 <br>
 
-## 📌 Day 5 – Optimization in Synthesis (Preview)
+## 📌 Day 5 – Optimization in Synthesis 
 
-* Fine-tune library selection (fast/slow cells) for timing & area trade-offs.
-* Use Yosys passes (`abc`, `opt`, `flatten`) for final design efficiency.
+## 🔹 1️⃣ If-Else Statements in Verilog
+
+**Purpose:** Conditional execution inside procedural blocks (`always`, `initial`, tasks).
+
+**Syntax:**
+
+```verilog
+if (condition) begin
+    // executed if true
+end else begin
+    // executed if false
+end
+```
+
+**Nested If-Else:**
+
+```verilog
+if (cond1)
+    // code1
+else if (cond2)
+    // code2
+else
+    // default code
+```
+
+**Hardware Mapping:**
+
+* `if-else` → **priority logic**.
+* Cascaded multiplexers implement priority; higher-priority conditions override lower ones.
+
+**Caution:** Incomplete `if` (no `else`) in **combinational logic** → **inferred latch**.
+
+<br>
+
+## 🔹 2️⃣ Inferred Latches
+
+**Problem Example:**
+
+```verilog
+module ex (
+    input a, b, sel,
+    output reg y
+);
+always @(a, b, sel) begin
+    if (sel == 1'b1)
+        y = a; // No else → y may retain previous value
+end
+endmodule
+```
+
+* If `sel = 0`, `y` is **not assigned** → synthesis infers a latch.
+
+**Fix:**
+
+```verilog
+always @(a, b, sel) begin
+    case(sel)
+        1'b1: y = a;
+        default: y = 1'b0; // Ensure assignment for all paths
+    endcase
+end
+```
+
+<br>
+
+## 🔹 3️⃣ Labs – If-Else and Case Statements
+
+
+### Lab 1: Incomplete If Statement
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-42-02" src="https://github.com/user-attachments/assets/00954892-6d64-4f62-9744-da63f984aca7" />
+
+```verilog
+module incomp_if (
+    input i0, i1, i2,
+    output reg y
+);
+always @(*) begin
+    if (i0)
+        y <= i1;  // No else → inferred latch
+end
+endmodule
+```
+
+**Observation:**
+
+* Simulation: `y` may hold previous value if `i0=0`.
+* Synthesis: Latch inferred.
+
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-30-56" src="https://github.com/user-attachments/assets/d696c870-2489-4809-85ca-f5db62d7cd61" />
+
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-30-46" src="https://github.com/user-attachments/assets/66165eb0-8d59-4a72-9ca4-c3bde853b3cf" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-33-04" src="https://github.com/user-attachments/assets/c22c1455-c263-4115-a440-71179c158aee" />
+
+<br>
+
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-32-52" src="https://github.com/user-attachments/assets/aefb6a19-fc79-4a8f-87ed-9a441ca74c39" />
+
+<br>
+
+### Lab 2: Incomplete Nested If-Else
+
+```verilog
+module incomp_if2 (
+    input i0, i1, i2, i3,
+    output reg y
+);
+always @(*) begin
+    if (i0)
+        y <= i1;
+    else if (i2)
+        y <= i3;  // No else → inferred latch
+end
+endmodule
+```
+
+**Observation:** Latch inferred for `y` when `i0=0` and `i2=0`.
+
+**Fix:** Add `else y <= default_value;`
+
+<br>
+
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-32-00" src="https://github.com/user-attachments/assets/f0d20397-a415-4cc9-a16e-9c836cee1c0b" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-31-53" src="https://github.com/user-attachments/assets/31665075-203c-45e9-aebd-f378c432a133" />
+
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-33-50" src="https://github.com/user-attachments/assets/748f216a-b78a-4bdd-b11c-5fe9fd3c83dd" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-33-44" src="https://github.com/user-attachments/assets/a58bf9ce-a9a1-4ce1-8403-fd58b7c49179" />
+
+
+<br>
+
+### Lab 3: Complete Case Statement
+
+```verilog
+module comp_case (
+    input i0, i1, i2,
+    input [1:0] sel,
+    output reg y
+);
+always @(*) begin
+    case(sel)
+        2'b00: y = i0;
+        2'b01: y = i1;
+        default: y = i2;  // Covers all unassigned cases
+    endcase
+end
+endmodule
+```
+
+✅ **No latches inferred**, purely combinational.
+
+<br>
+
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-44-03" src="https://github.com/user-attachments/assets/b8d1cdf1-084e-4b31-baab-f3000c8a6701" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-43-53" src="https://github.com/user-attachments/assets/b4d0805d-6c12-466c-9036-0177c17cd789" />
+
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-40-36" src="https://github.com/user-attachments/assets/2c68c801-202c-49de-90b4-926d345d85c3" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-40-22" src="https://github.com/user-attachments/assets/5fe4200b-7770-498e-9ffb-5e16b2926665" />
+
+
+<br>
+
+### Lab 4 & 5: Incomplete Case & Partial Assignment
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-45-20" src="https://github.com/user-attachments/assets/c8325495-e0f6-4c8b-b286-41050bbe6f2a" />
+
+<br>
+
+```verilog
+module incomp_case (input i0 , input i1 , input i2 , input [1:0] sel, output reg y);
+always @ (*)
+begin
+	case(sel)
+		2'b00 : y = i0;
+		2'b01 : y = i1;
+	endcase
+end
+endmodule
+```
+<br>
+
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-46-25" src="https://github.com/user-attachments/assets/5cc9eb21-5b37-48e4-bdee-c2d31416efac" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-46-11" src="https://github.com/user-attachments/assets/47e15e10-6de8-49f2-b141-62b902bdaaa0" />
+
+
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-48-53" src="https://github.com/user-attachments/assets/6af7e0cf-be5d-43ea-ba0c-abd5596374a9" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-48-43" src="https://github.com/user-attachments/assets/250e6a67-4ded-453f-950f-656321582e1a" />
+
+
+
+<br>
+
+```verilog
+module partial_case_assign (
+    input i0,i1,i2,
+    input [1:0] sel,
+    output reg y, x
+);
+always @(*) begin
+    case(sel)
+        2'b00: begin y=i0; x=i2; end
+        2'b01: y=i1;  // x not assigned → inferred latch
+        default: begin x=i1; y=i2; end
+    endcase
+end
+endmodule
+```
+
+<br>
+
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-59-45" src="https://github.com/user-attachments/assets/ca0ee736-bfaa-4359-8be1-0a82e068e7c4" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-59-34" src="https://github.com/user-attachments/assets/63cb5dab-dd4a-4e0f-89d5-6e0c0ffbf8c9" />
+
+
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-51-43" src="https://github.com/user-attachments/assets/9837afb0-f094-4f70-8d69-f1ff312d4d36" />
+
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-51-36" src="https://github.com/user-attachments/assets/93d909b1-0814-48c4-bae0-b8252062c1f5" />
+
+
+
+
+<br>
+**Lesson:** Always assign **all outputs in all case branches**; use `default` to avoid latches.
+
+<br>
+
+## For Loops in Verilog
+
+**Purpose:** Repeat statements; synthesizable if iteration count is fixed.
+
+**Example: 4-to-1 MUX using loop**
+
+```verilog
+module mux_4to1_for_loop (
+    input [3:0] data,
+    input [1:0] sel,
+    output reg y
+);
+integer i;
+always @(data, sel) begin
+    y = 1'b0;
+    for (i=0; i<4; i=i+1)
+        if (i == sel)
+            y = data[i];
+end
+endmodule
+```
+
+**Observation:**
+
+* Loop unrolled during synthesis → efficient MUX logic.
+
+<br>
+
+## Generate Blocks in Verilog
+
+**Purpose:** Instantiate multiple hardware modules or logic structures at compile time.
+
+**Example: Generate AND gates**
+
+```verilog
+genvar i;
+generate
+    for (i = 0; i < 4; i=i+1) begin : gen_loop
+        and_gate u_and (.a(in[i]), .b(in[i+1]), .y(out[i]));
+    end
+endgenerate
+```
+
+**Use Case:** Scalable and synthesizable repetitive structures.
+
+<br>
+
+## Ripple Carry Adder (RCA) Using Generate Block
+
+```verilog
+module fa (input a,b,c, output co,sum);
+    assign {co, sum} = a + b + c;
+endmodule
+
+module rca (
+    input [7:0] num1, num2,
+    output [8:0] sum
+);
+wire [7:0] int_sum, int_co;
+
+genvar i;
+generate
+    for (i=1; i<8; i=i+1) begin : fa_gen
+        fa u_fa (.a(num1[i]), .b(num2[i]), .c(int_co[i-1]), 
+                 .co(int_co[i]), .sum(int_sum[i]));
+    end
+endgenerate
+
+fa u_fa0 (.a(num1[0]), .b(num2[0]), .c(1'b0), 
+          .co(int_co[0]), .sum(int_sum[0]));
+
+assign sum[7:0] = int_sum;
+assign sum[8] = int_co[7];
+endmodule
+```
+
+**Observation:**
+
+* Each full adder instantiated using `generate`.
+* Carry chains properly connected → correct ripple-carry behavior.
+
+<br>
+
+### ✅ Key Takeaways – Day 4
+
+1. **If-Else:** Good for priority logic; always cover all conditions to avoid latches.
+2. **Case Statement:** Good for MUX/decoder style selection; use `default`.
+3. **Inferred Latches:** Occur if output not assigned in all paths. Avoid in combinational logic.
+4. **For Loops:** Synthesizable for fixed iteration counts; useful for repeated logic like MUX or arithmetic.
+5. **Generate Blocks:** Efficiently create multiple module instances or logic structures.
+6. **RCA Example:** Shows practical use of loops and generate blocks for arithmetic.
+7. **Best Practices:** Always assign outputs for all conditions, use loops/generate for scalable RTL, avoid accidental latches.
+8.  Fine-tune library selection (fast/slow cells) for timing & area trade-offs.
+9.  Use Yosys passes (`abc`, `opt`, `flatten`) for final design efficiency.
 
 
 <br>
 
 **Author & Repository**
 **Author:** T Tushar Shenoy
-**Repository:** Sky130-RTL-Design-Workshop
+**Repository:** Week-1-RTL-Design-Gate-Level-Synthesis-GLS
 **Program:** VLSI System Design (VSD)
 
