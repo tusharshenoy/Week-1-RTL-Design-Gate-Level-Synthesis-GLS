@@ -444,7 +444,7 @@ write_verilog -noattr good_mux_netlist.v
 
 <br>
 
-📌 **Day 2 – Timing Libraries, Hierarchical vs Flat Synthesis, Flop Coding & RTL Optimizations**
+ ## 📌 Day 2 – Timing Libraries, Hierarchical vs Flat Synthesis, Flop Coding & RTL Optimizations
 
 <br>
 
@@ -676,7 +676,7 @@ write_verilog dff_asyncres_syn.v
 
 <br>
 
-**Other Flops:**
+### Other Flops:
 
 <br>
 
@@ -784,8 +784,559 @@ endmodule
 
 <br>
 
-## 📌 Day 3 – Combinational & Sequential Optimizations (Preview)
+## 📌 Day 3 – Combinational & Sequential Optimizations 
+<br>
 
+## 📖 Theory
+
+Digital design isn’t just about correctness — it’s also about **efficiency**. Optimisation in synthesis ensures the hardware meets **area, power, and timing goals** while keeping functionality intact.
+
+### 🔹 Combinational Logic Optimisation
+
+These are techniques applied to purely combinational circuits (no memory elements).
+
+* **Objective:** Reduce the number of gates, simplify logic, save area & power.
+* **Key Methods:**
+
+  * **Constant Propagation:** Replace logic expressions with constants when inputs are fixed.
+  * **Direct Optimisation:** Simplify obvious redundancies.
+  * **Boolean Logic Optimisation:** Reduce Boolean equations using algebra, **K-Maps**, or **Quine–McCluskey Algorithm**.
+  * **Gate-Level Minimisation:** Replace multi-level logic with equivalent simpler forms.
+
+👉 **Example: Constant Propagation**
+
+```
+Y = ((AB) + C)'
+If A = 0 ⇒ Y = (0 + C)' = C'
+```
+
+So instead of 3 gates (AND, OR, NOT), we just need a **NOT gate**!
+
+<br>
+
+### 🔹 Sequential Logic Optimisation
+
+These apply to circuits with memory (flip-flops, registers). Optimisations not only save area but also improve timing closure.
+
+* **Basic:**
+
+  * **Sequential Constant Propagation** – remove flip-flops that always hold constant values.
+* **Advanced:**
+
+  * **State Optimisation** – remove unused FSM states or merge equivalent states.
+  * **Retiming** – move registers across logic cones to balance delay, enabling higher clock frequency.
+  * **Sequential Logic Cloning (Floorplan Aware)** – duplicate registers/logic depending on physical placement to reduce long interconnect delays.
+
+👉 **Retiming Example**
+
+* At **200 MHz (5 ns period)** → logic delay may be too large.
+* By moving registers inside the logic cone, delay can be split → achieving **500 MHz (2 ns period)**.
+
+<br>
+
+### 📊 Quick Comparison
+
+| Optimisation Type | Focus                    | Example                                    |
+| ----------------- | ------------------------ | ------------------------------------------ |
+| **Combinational** | Gates, logic expressions | Constant Propagation, Boolean minimisation |
+| **Sequential**    | Flip-flops, FSM, timing  | State optimisation, Retiming, Cloning      |
+
+<br>
+
+## 🧪 Labs
+
+### 🧩 Lab 6 – Combinational Logic Optimisations
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-14-23" src="https://github.com/user-attachments/assets/c21ceadf-9664-4b27-86c0-68f4e5d36c04" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-04-24" src="https://github.com/user-attachments/assets/79bdbb29-50b5-4662-a7d4-f1718fc25828" />
+
+
+<br>
+
+#### 🔸 Example 1 – Simple MUX → AND Gate
+
+```verilog
+module opt_check (input a , input b , output y);
+  assign y = a ? b : 0;
+endmodule
+```
+
+* Functionally `y = a & b`.
+* Synthesis removes unused paths and directly maps to an **AND gate**.
+* Command used:
+
+  ```
+  opt_clean -purge
+  ```
+### Synthesis 
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-14-41" src="https://github.com/user-attachments/assets/e4888b8a-ae91-4b3f-b06e-e4e5866c8565" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-14-49" src="https://github.com/user-attachments/assets/7ccabcda-a09e-4cb3-b65f-e9ecae88eb52" />
+
+<br>
+
+#### 🔸 Example 2 – MUX → OR Gate
+
+```verilog
+module opt_check2 (input a , input b , output y);
+  assign y = a ? 1 : b;
+endmodule
+```
+
+* Equivalent to `y = a | b`.
+* Synthesis recognises constant `1` and optimises into **OR gate**.
+
+### Synthesis 
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-20-54" src="https://github.com/user-attachments/assets/ff0c7bdf-c004-4419-9508-94bcafdabb12" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-20-45" src="https://github.com/user-attachments/assets/72e1d311-0182-48bb-8a2d-337a0927ce74" />
+
+<br>
+
+#### 🔸 Example 3 – Nested MUX → AND Chain
+
+```verilog
+module opt_check3 (input a , input b, input c , output y);
+  assign y = a ? (c ? b : 0) : 0;
+endmodule
+```
+
+* Simplifies to: `y = a & b & c`.
+* Multiple conditions collapse into one **AND chain**.
+
+### Synthesis 
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-29-50" src="https://github.com/user-attachments/assets/7696d002-5461-4f21-aafd-f0f72a115104" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-29-23" src="https://github.com/user-attachments/assets/71a5a21f-80cf-4300-9677-a0369a83aba2" />
+
+<br>
+
+#### 🔸 Example 4 – Complex Conditional Expression
+
+```verilog
+module opt_check4 (input a , input b , input c , output y);
+  assign y = a ? (b ? (a & c) : c) : (!c);
+endmodule
+```
+
+* Three branches considered:
+
+  * If `a=1, b=1 → y = a & c`
+  * If `a=1, b=0 → y = c`
+  * If `a=0 → y = !c`
+* Synthesis reduces redundant paths. This is an example of **multi-level Boolean optimisation**.
+
+### Synthesis 
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-34-27" src="https://github.com/user-attachments/assets/1036620f-4f0e-471e-99dc-8a9038598348" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-34-32" src="https://github.com/user-attachments/assets/2c6ae6b9-d7b3-4417-b235-5d2e420a7fef" />
+
+<br>
+
+#### 🔸 Example 5 – Multiple Modules with Constants
+
+```verilog
+module sub_module1(input a , input b , output y);
+  assign y = a & b;
+endmodule
+
+module sub_module2(input a , input b , output y);
+  assign y = a ^ b;
+endmodule
+
+module multiple_module_opt(input a , input b , input c , input d , output y);
+  wire n1,n2,n3;
+
+  sub_module1 U1 (.a(a) , .b(1'b1) , .y(n1));
+  sub_module2 U2 (.a(n1), .b(1'b0) , .y(n2));
+  sub_module2 U3 (.a(b), .b(d) , .y(n3));
+
+  assign y = c | (b & n1); 
+endmodule
+```
+
+* `n1 = a & 1 = a`
+* `n2 = a ^ 0 = a` (but unused → eliminated)
+* `n3 = b ^ d` (unused → eliminated)
+* Final `y = c | (b & a)`
+
+### Synthesis Hierarchial
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-39-54" src="https://github.com/user-attachments/assets/55466e46-2cb6-4897-9901-c49b19ce649e" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-39-43" src="https://github.com/user-attachments/assets/d97ba9ff-b9cb-443a-a022-bbba00b59ddf" />
+
+
+<br>
+
+### Synthesis Flatten
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-40-56" src="https://github.com/user-attachments/assets/463a4700-119a-4417-b292-493e365aec52" />
+
+<br>
+
+👉 Demonstrates **module-level constant propagation** and **removal of unused nets**.
+
+✅ **Lab 6:** Combinational logic collapses aggressively → constants simplify paths, unused modules vanish, redundant nets are removed.
+
+<br>
+
+### 🧩 Lab 7 – Sequential Logic Optimisations
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-54-10" src="https://github.com/user-attachments/assets/1169593c-f1b3-43e1-84d4-df85eaa143ee" />
+
+#### 🔸 Example 1 – DFF with constant `1` input
+
+```verilog
+module dff_const1(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+		q <= 1'b0;
+	else
+		q <= 1'b1;
+end
+endmodule
+```
+
+* Behaviour: After reset → output always `1`.
+* Synthesis replaces flip-flop with a **constant wire = 1**.
+
+### Simulation
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-00-05" src="https://github.com/user-attachments/assets/8f6cee8b-f9e9-4b91-8f82-7170212b7c47" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 20-59-41" src="https://github.com/user-attachments/assets/e228410c-1921-4fea-9f6e-958a23af3399" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-09-55" src="https://github.com/user-attachments/assets/8705f07e-851c-4346-97b9-5fab37ec75b6" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-09-25" src="https://github.com/user-attachments/assets/79466efc-6c58-4729-b439-c890f6466df2" />
+
+<br>
+
+#### 🔸 Example 2 – DFF always `1`
+
+```verilog
+module dff_const2(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+		q <= 1'b1;
+	else
+		q <= 1'b1;
+end
+endmodule
+```
+
+* Behaviour: Output always `1` (independent of reset).
+* Synthesis removes FF → direct `assign q = 1'b1`.
+
+### Simulation
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-02-59" src="https://github.com/user-attachments/assets/eb0e55ca-3be9-4df2-911a-64f775b0533b" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-02-46" src="https://github.com/user-attachments/assets/b05f97fe-6ce2-4e97-9948-1574d9994e44" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-12-50" src="https://github.com/user-attachments/assets/3bff97a5-79b2-4dfe-8658-9a948fcfb2d3" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-12-42" src="https://github.com/user-attachments/assets/38e0259b-a26f-471a-86b3-3d7663e3c286" />
+
+<br>
+
+### Waveform Comparision of dff_const1.v and dff_const2.v
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-04-11" src="https://github.com/user-attachments/assets/92238c5f-cfee-4999-b462-2a0b0daab1ae" />
+
+<br>
+
+#### 🔸 Example 3 – Two FFs with constants
+
+```verilog
+module dff_const3(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset) begin
+		q <= 1'b1;
+		q1 <= 1'b0;
+	end
+	else begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+endmodule
+```
+
+* On reset: `q=1`, `q1=0`.
+* After first clock: `q1=1`, then `q` follows `q1`.
+* Eventually, `q` stabilises at **1 forever** → optimiser removes FFs.
+
+### Simulation
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-48-29" src="https://github.com/user-attachments/assets/8d7881b8-2395-4dee-ba82-bb2c3cf19362" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-48-18" src="https://github.com/user-attachments/assets/09f8db23-ccd8-4517-8a03-fbb2d15b6d08" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c0007fa9-716a-4cf2-8012-4b7d57c525fb" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-52-49" src="https://github.com/user-attachments/assets/d931d2d2-543e-497d-85b3-e4f1750eb06b" />
+
+<br>
+
+#### 🔸 Example 4 – Two FFs with constant `1`
+
+```verilog
+module dff_const4(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b1;
+		q1 <= 1'b1;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+endmodule
+```
+
+* On reset: `q=1`, `q1=1`.
+* After first clock: `q1` stays `1`, `q` follows `q1 = 1`.
+* Both registers always output **1** → synthesis replaces FFs with a constant `1'b1`.
+
+### Simulation
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-56-15" src="https://github.com/user-attachments/assets/d42383b3-626e-4663-8d9f-933c39603ecc" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-56-23" src="https://github.com/user-attachments/assets/ff978e07-079e-4325-8258-e15a5ef61512" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-57-09" src="https://github.com/user-attachments/assets/34f74037-c12e-4821-ad41-11a8dcc8bf4c" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-57-01" src="https://github.com/user-attachments/assets/6f860495-cc8f-4ab8-ad13-39efd5d5eb0e" />
+
+
+<br>
+
+#### 🔸 Example 5 – Two FFs with reset to `0`
+
+```verilog
+module dff_const5(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b0;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+endmodule
+```
+
+* On reset: `q=0`, `q1=0`.
+* After first clock: `q1` becomes `1`, `q` follows `q1` (so `q=1` from 2nd cycle onwards).
+* Eventually, both outputs stabilise at **1 forever** → registers collapse and synthesis replaces them with constant `1'b1`.
+
+### Simulation
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-58-07" src="https://github.com/user-attachments/assets/b0a461f9-a5c0-464f-aa32-392369d64dcf" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-57-53" src="https://github.com/user-attachments/assets/c0b45d10-5937-40e2-aaae-27fe857d6a4b" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-59-12" src="https://github.com/user-attachments/assets/20a69c9f-1d02-4b3b-9019-c921d2b970db" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 21-59-06" src="https://github.com/user-attachments/assets/ff365106-39e2-408a-abd7-6c977fa567af" />
+
+
+<br>
+
+
+✅ **Lab 7:** Sequential constant propagation is powerful → registers collapse when behaviour reduces to constants.
+
+<br>
+
+### 🧩 Sequential Optimisation – Unused Outputs
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 22-07-27" src="https://github.com/user-attachments/assets/7de2f40c-a9ec-46b6-b724-d2647859dd1c" />
+
+<br>
+
+#### 🔸 Counter Example 1 – Only LSB Used
+
+```verilog
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = count[0];
+
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+endmodule
+```
+
+* `count` is 3 bits but only `count[0]` drives output.
+* Synthesis removes upper bits → only **1 FF inferred**.
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 22-04-27" src="https://github.com/user-attachments/assets/62f7c8ed-a276-4dce-8832-e6fac13375da" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 22-03-20" src="https://github.com/user-attachments/assets/df82959d-8859-404c-be0c-97339af6732b" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 22-03-25" src="https://github.com/user-attachments/assets/6af525eb-441e-4a7d-b049-c3f1e332063b" />
+
+<br>
+
+#### 🔸 Counter Example 2 – Using Comparison
+
+```verilog
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = (count[2:0] == 3'b100);
+
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+endmodule
+```
+
+* Since output depends on all bits, optimiser **retains full 3-bit counter**.
+
+✅ **Takeaway:** **Unused outputs** → optimised away. But if full vector is needed for logic, synthesis preserves all bits.
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 22-10-26" src="https://github.com/user-attachments/assets/c2d22f74-da3b-4533-bf49-62bba11b2d28" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 22-10-00" src="https://github.com/user-attachments/assets/49263035-2b6e-48a4-b359-cb20fa48b37b" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-24 22-09-51" src="https://github.com/user-attachments/assets/2db45c5a-86e2-435a-ac05-2fbe11dcb5b8" />
+
+
+<br>
+
+### ✅ Key Takeaways – Day 2
+
+* **Combinational Optimisation:** Constant propagation, Boolean minimisation, redundant gate removal.
+* **Sequential Optimisation:** Sequential constants, unused state/output removal, retiming, cloning.
+* **Lab Exercises:** Show how synthesis tools aggressively simplify logic → reducing FFs, gates, and power usage.
 * Use `opt_clean -purge` in Yosys to remove redundant logic.
 * Constant propagation and resource sharing to reduce area and improve speed.
 
