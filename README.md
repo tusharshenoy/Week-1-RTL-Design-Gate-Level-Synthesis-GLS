@@ -21,7 +21,6 @@ The workshop is structured **day-wise** for clarity:
 
 <br>
 
-
 ## 📌 Day 1 – Introduction to Verilog RTL Design & Synthesis
 
 ### 1️⃣ Core Concepts
@@ -71,7 +70,9 @@ Design (Verilog) + Testbench → iverilog → a.out → .vcd file → GTKWave
    During simulation, Iverilog generates a **VCD file** which records **value changes in signals** over time. ⏳
 
 5. **GTKWave**
-   A **waveform visualization tool** that: * Loads the **VCD file** * Allows designers to inspect **waveforms, clock cycles, and output transitions** This flow facilitates **debugging**, **verification** and provides **insight into design operation** by visualizing simulation results. 📊
+   A **waveform visualization tool** that:
+   * Loads the **VCD file**
+   * * Allows designers to inspect **waveforms, clock cycles, and output transitions** This flow facilitates **debugging**, **verification** and provides **insight into design operation** by visualizing simulation results. 📊
 
 > This flow facilitates **debugging**, **verification**, and provides **insight into design operation**.
 
@@ -89,19 +90,21 @@ Stimulus Generator → Design → Stimulus Observer
 * **Design:** Processes inputs → produces outputs 🔄
 * **Stimulus Observer:** Checks outputs vs expected values ✅
 
- <br>
-
 **Visualization:** <img width="1913" height="1076" alt="Screenshot from 2025-09-26 16-24-32" src="https://github.com/user-attachments/assets/82a00556-b831-407f-9827-5fb89eae83e6" />
 
 The **Verilog Design** and its **Test Bench** are compiled and run by the **Iverilog simulator**. During simulation, the tool produces a **VCD file (Value Change Dump format)**, which records **signal changes over time**. To visualize the signal transitions and verify behavior, this **VCD file** is loaded into **GTKWave**, a waveform viewer that aids **debugging** and **analysis**
 <br>
+
 **Notes:**
 
 * Testbench itself does **not expose primary inputs/outputs**.
 * Ensures design correctness under **all input conditions**.
 * Same testbench can be reused for **RTL & synthesized netlist verification**.
-* The design may have **one or more primary input/output signals**. <br> * The test bench itself **does not expose any primary I/Os** directly. Its sole function is to **generate, monitor, and validate** the design's responses within a controlled simulation.
+* The design may have **one or more primary input/output signals**.
+* The test bench itself **does not expose any primary I/Os** directly. Its sole function is to **generate, monitor, and validate** the design's responses within a controlled simulation.
 
+ <br>
+ 
 ### 4️⃣ Yosys & Gate Libraries
 
 **What is Yosys?**
@@ -111,7 +114,6 @@ The **Verilog Design** and its **Test Bench** are compiled and run by the **Iver
 * Ensures functional correctness via **gate-level simulation** ✅
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-01-29" src="https://github.com/user-attachments/assets/0952cfea-e919-4ad9-b046-2db15e60e963" />  
-
 
 Shows the basic synthesis flow: the RTL design and a .lib library are input to a synthesizer (Yosys), producing a gate-level netlist. Yosys is specifically mentioned as the tool used.
 <br>
@@ -125,6 +127,9 @@ Shows the basic synthesis flow: the RTL design and a .lib library are input to a
 #### What is `.lib`?
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-03-24" src="https://github.com/user-attachments/assets/e0136a80-db41-46d8-a386-ae539c2bd528" />
+
+
+<br>
 
 * `.lib` – Collection of logical modules
 * Includes basic logic gates: AND, OR, NOT, etc.
@@ -150,7 +155,6 @@ Shows the basic synthesis flow: the RTL design and a .lib library are input to a
 
 <br>
 
-
 ### RTL Design
 
 ```verilog
@@ -174,16 +178,21 @@ endmodule
 
 <br>
 
-
 ### Why We Need Different Flavours of Gates?
 * Combinational delay determines max circuit speed:
-  
+
+  <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-03-31" src="https://github.com/user-attachments/assets/c1e6630c-df55-4009-a363-f7d8a3c5d751" />
+
+<br>
+
 $$ T_{CLK} > T_{CQ\_A} + T_{COMBI} + T_{SETUP\_B} $$
 
 * Fast cells → reduce combinational delay
 * Slow cells → prevent hold violations
 
-**Explanation:** Circuit speed is limited by logic path delays. * Using **fast gates** → reduces delay, allows higher clock frequencies * Using **slow gates** → prevents early arrival at flip-flops (hold violations)
+**Explanation:** Circuit speed is limited by logic path delays. 
+* Using **fast gates** → reduces delay, allows higher clock frequencies 
+* Using **slow gates** → prevents early arrival at flip-flops (hold violations)
 
 > Multiple gate flavors in `.lib` provide **timing optimization flexibility** ⏱️
 
@@ -203,6 +212,8 @@ $$ T_{CLK} > T_{CQ\_A} + T_{COMBI} + T_{SETUP\_B} $$
 
 ### Logic Synthesis
 
+<img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-03-08" src="https://github.com/user-attachments/assets/9c4b017d-c3d6-422e-abf7-218d002975db" />
+
 * RTL → Gate-level translation
 * Converts design into **gates & connections (netlist)**
 
@@ -212,7 +223,6 @@ $$ T_{CLK} > T_{CQ\_A} + T_{COMBI} + T_{SETUP\_B} $$
 * Specifies **all gates & interconnections** needed for fabrication 🏭
 
 <br>
-
 
 ### 6️⃣ Synthesis Illustration (Mux + Register)
 
@@ -242,7 +252,6 @@ endmodule
 
 <br>
 
-
 ### 7️⃣ Digital Logic Circuit from RTL
 
 ```verilog
@@ -264,9 +273,10 @@ endmodule
 
 ### 8️⃣ Why We Need Slow Cells
 
-$$
-T_{HOLD\_B} < T_{CQ\_A} + T_{COMBI}
-$$
+<img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-04-36" src="https://github.com/user-attachments/assets/dca7c645-f9f3-4b02-b61c-d4797f7f1b98" />
+<br>
+
+$$ T_{HOLD\_B} < T_{CQ\_A} + T_{COMBI} $$
 
 * Prevents **hold issues** at flip-flops
 * Fast cells → performance
@@ -277,7 +287,6 @@ Slow cells prevent **early data arrival**; fast cells maintain **overall perform
 
 <br>
 
-
 ### Faster Cells vs Slower Cells
 
 * Load → Capacitance ⚡
@@ -285,15 +294,30 @@ Slow cells prevent **early data arrival**; fast cells maintain **overall perform
 * Wider transistors → Low delay, higher area & power
 * Narrow → Higher delay, lower area & power
 
-**Explanation:** Gate speed depends on **ability to drive capacitive loads**. * **Fast cells** (wide transistors) → low delay, higher area/power * **Slow cells** (narrow transistors) → save area/power but increase delay
+**Explanation:** Gate speed depends on **ability to drive capacitive loads**. 
+* **Fast cells** (wide transistors) → low delay, higher area/power
+*  * **Slow cells** (narrow transistors) → save area/power but increase delay
 
 > Fast cells trade **speed for area/power** 🔄
-
 
 <br>
 
 ### 4️⃣ Labs – Day 1
+#### Clone the Workshop Repository 🛠️
 
+To start the lab, first clone the workshop repository from GitHub:
+
+```bash
+git clone https://github.com/kunalg123/sky130RTLDesignAndSynthesisWorkshop
+cd sky130RTLDesignAndSynthesisWorkshop
+```
+<img width="1920" height="1080" alt="Screenshot from 2025-09-22 09-47-04" src="https://github.com/user-attachments/assets/59da2a7e-7618-4a75-b68f-c89e2444a421" />
+
+This will download all the necessary files and bring you into the project folder where the lab exercises are located.
+
+verilog_labs folder Contains all the design and testbench files:
+<img width="1920" height="1080" alt="Screenshot from 2025-09-22 09-47-36" src="https://github.com/user-attachments/assets/20dd968a-6234-4409-9b9c-9b4a90b3d6e2" />
+<br>
 #### Lab 1: Introduction to Icarus Verilog & Design Testbench
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-00-19" src="https://github.com/user-attachments/assets/de0dbded-01b7-4148-8529-d6ac43fe4e0b" />
@@ -363,6 +387,8 @@ synth -top good_mux
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-14-23" src="https://github.com/user-attachments/assets/53f8406b-1ae8-489b-8c79-b00c93ec0d75" />
 
+<br>
+
 ```bash
 abc -liberty ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
 ```
@@ -371,6 +397,8 @@ abc -liberty ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 
 <br>
 <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-22-45" src="https://github.com/user-attachments/assets/7248fe64-e27f-4cd6-b0d0-d380089ebd05" />
+
+<br>
 
 ```bash
 show
@@ -388,12 +416,14 @@ write_verilog good_mux_netlist.v
 ```
 <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-31-26" src="https://github.com/user-attachments/assets/392050dd-4065-476d-b09f-9729706c55ea" />
 
+<br>
+
 ```bash
 write_verilog -noattr good_mux_netlist.v
 ```
 <img width="1920" height="1080" alt="Screenshot from 2025-09-22 10-33-07" src="https://github.com/user-attachments/assets/cff43080-ae2c-47f4-98c1-a21e4ce0b977" />
 
-
+<br>
 
 **Key Observations:** 
 
@@ -412,16 +442,345 @@ write_verilog -noattr good_mux_netlist.v
 * **Faster vs slower cells** balance timing, area, and power ⚡
 * Same **testbench can verify RTL & synthesized netlist**
 
+<br>
+
+📌 **Day 2 – Timing Libraries, Hierarchical vs Flat Synthesis, Flop Coding & RTL Optimizations**
+
+<br>
+
+### 1️⃣ Understanding `.lib` Files 📚
+
+**What is a `.lib` (Timing Library)?**
+
+* A `.lib` file contains **pre-characterized standard cells** with info about timing, power, area, and operating conditions.
+* Helps synthesis tools map **RTL → gates** efficiently while respecting performance, power, and area constraints.
+* Example header from SkyWater `sky130_fd_sc_hd__tt_025C_1v80.lib`:
+
+```tcl
+library ("sky130_fd_sc_hd__tt_025C_1v80") {
+    define(def_sim_opt,library,string);
+    define(driver_model,library,string);
+    technology("cmos");
+    delay_model : "table_lookup";
+    time_unit : "1ns";
+    voltage_unit : "1V";
+    current_unit : "1mA";
+    capacitive_load_unit(1.0, "pf");
+    default_max_transition : 1.5;
+    operating_conditions ("tt_025C_1v80") {
+        voltage : 1.8;
+        temperature : 25.0;
+        process : 1.0;
+    }
+    ...
+}
+```
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 13-04-16" src="https://github.com/user-attachments/assets/710d34b9-cb53-4963-9b4c-6ab43a6d5c39" />
+
+**Key Highlights of `.lib`:**
+
+| Attribute                      | Description                                                          |
+| ------------------------------ | -------------------------------------------------------------------- |
+| **technology**                 | CMOS or other tech                                                   |
+| **delay_model**                | How delays are reported (table_lookup, etc.)                         |
+| **time/voltage/current units** | Units used for characterization                                      |
+| **operating_conditions**       | PVT conditions: Process, Voltage, Temperature                        |
+| **cell definitions**           | Each gate (AND2, OR2, NAND, etc.) with area, leakage, waveform, etc. |
+
+**Process-Voltage-Temperature (PVT) Analysis**:
+
+* **Process variation**: Fabrication imperfections → different transistor speeds
+* **Voltage variation**: Voltage fluctuations change switching behavior ⚡
+* **Temperature variation**: Chips heat up differently → affects delay
+* **Goal:** Ensure design works **across all PVT corners** using `.lib` data
+
+<br>
+
+### 2️⃣ Example Cell Analysis – AND2
+
+**Sky130 standard cell examples:**
+
+| Attribute          | AND2_0 (Slow)           | AND2_2 (Medium) | AND2_4 (Fast) |
+| ------------------ | ----------------------- | --------------- | ------------- |
+| Leakage Power      | Low                     | Medium          | High          |
+| Area               | 6.256                   | 7.507           | 8.758         |
+| Cell Footprint     | "sky130_fd_sc_hd__and2" | Same            | Same          |
+| Cell Leakage Power | 0.0019                  | 0.0036          | 0.0045        |
+
+<img width="1920" height="1080" alt="comparision" src="https://github.com/user-attachments/assets/6ea6ab60-84be-43f2-8fc3-44a96accd8cf" />
+<br>
+
+**Observation:**
+
+* **Wider/Faster cells → lower delay, higher area & leakage**
+* **Smaller/Slower cells → higher delay, lower area & leakage**
+
+**Example `.lib` snippet for AND2:**
+
+```tcl
+cell ("sky130_fd_sc_hd__and2_0") {
+    leakage_power () { value : 0.0021372; when : "!A&B"; }
+    leakage_power () { value : 0.0018183; when : "!A&!B"; }
+    area : 6.256;
+    driver_waveform_fall : "ramp";
+}
+```
+
+* **Design takeaway:** Synthesis tools pick cells (slow/medium/fast) based on **timing, power, and area tradeoffs**.
+
+<br>
+
+### 3️⃣ Lab 5 – Hierarchical vs Flat Synthesis 🏗️
+
+**RTL Example: `multiple_modules.v`**
+
+```verilog
+module sub_module2(input a, input b, output y);
+    assign y = a | b;
+endmodule
+
+module sub_module1(input a, input b, output y);
+    assign y = a & b;
+endmodule
+
+module multiple_modules(input a, input b, input c, output y);
+    wire net1;
+    sub_module1 u1(.a(a), .b(b), .y(net1));
+    sub_module2 u2(.a(net1), .b(c), .y(y));
+endmodule
+```
+<img width="1920" height="1080" alt="multiple modules" src="https://github.com/user-attachments/assets/ab1bea56-cd9a-49ee-8611-e3d25da63f41" />
+
+<br>
+
+**Synthesis Flow using Yosys:**
+
+```tcl
+read_liberty -lib ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog multiple_modules.v
+synth -top multiple_modules
+abc -liberty ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show multiple_modules
+write_verilog -noattr multiple_modules_hier.v
+```
+<img width="1920" height="1080" alt="synthesis multiple modules" src="https://github.com/user-attachments/assets/a8951263-b60f-428d-b22f-8c66b9fc88d6" />
+
+<br>
+
+<img width="1920" height="1080" alt="statistics" src="https://github.com/user-attachments/assets/af996cac-c9af-421d-8b9d-2d47aab62dc7" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 13-34-18" src="https://github.com/user-attachments/assets/b1d2fef7-0871-4b84-b56e-6acf90eca051" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 13-37-18" src="https://github.com/user-attachments/assets/ef26c3ca-bd29-4dce-96f5-1bea097402e9" />
+
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 13-33-59" src="https://github.com/user-attachments/assets/247a5941-4160-4f08-8705-8b2e1a5d7f88" />
+
+<br>
+
+**Observation:**
+
+* Hierarchical netlist preserves **module structure**.
+* Example: AND2 cell used as `sky130_fd_sc_hd__and2_0` instead of OR → **logical effort / transistor stacking optimization**:
+
+```verilog
+sky130_fd_sc_hd__and2_0 _3_ ( .A(_1_), .B(_0_), .X(_2_)
+```
+
+**Flattening Netlist:**
+
+```tcl
+flatten
+write_verilog -noattr multiple_modules_flat.v
+```
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 14-52-22" src="https://github.com/user-attachments/assets/18105746-413d-41fd-8835-1b7c53b29aa1" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 14-28-07" src="https://github.com/user-attachments/assets/591c380f-5243-4e34-9d5b-13598af41663" />
+
+<br>
+
+<img width="1920" height="1080" alt="flatten_synthesis" src="https://github.com/user-attachments/assets/ca9ada83-e4cd-4f00-9d63-7015c7c783b0" />
+
+<br>
+
+* Flattening merges hierarchy → **better optimization, harder to debug**
+* Submodule synthesis allows **divide & conquer**, useful for repeated modules in large designs
+
+<br>
+
+### Comparision 
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 14-31-27" src="https://github.com/user-attachments/assets/48e8c797-4640-4dfa-b415-0511e7fb0d34" />
+
+<br>
+
+### 4️⃣ Flop Coding Styles & Synthesis ⚡
+
+**Why Use Flops?**
+
+* Flops prevent **glitches** caused by combinational logic
+* Synchronize signals in **clocked domains**
+* Provide predictable behavior for synthesis
+
+**Flop Variants Simulated:**
+
+* `dff_asyncres.v` → Async Reset
+* `dff_async_set.v` → Async Set
+* `dff_syncres.v` → Sync Reset
+* `dff_asyncres_syncres.v` → Async Reset + Sync Reset
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-25-04" src="https://github.com/user-attachments/assets/565013c8-a6c2-49ae-951b-9a67fe426684" />
+
+<br>
+
+**Simulation Flow for Flops:**
+
+```tcl
+iverilog dff_asyncres.v tb_dff_asyncres.v
+./a.out
+gtkwave tb_dff_asyncres.vcd
+```
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-27-54" src="https://github.com/user-attachments/assets/be76645c-e6ec-44aa-acd8-b0fbbf442e57" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-29-31" src="https://github.com/user-attachments/assets/e5f0ed3f-1a07-4a72-bc11-8936226b9698" />
 
 
-## 📌 Day 2 – Timing Libraries & Efficient RTL Coding (Brief)
+**Synthesis Flow for Flops:**
 
-* **Timing Libraries**: `.lib` files provide delays, drive strengths, and functional info for gates.
-* **Hierarchical vs Flat Synthesis**:
+```tcl
+read_verilog dff_asyncres.v
+dfflibmap -liberty ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+synth -top dff_asyncres
+write_verilog dff_asyncres_syn.v
+```
 
-  * **Hierarchical**: Keeps module boundaries, good for reuse.
-  * **Flat**: Optimizes globally but removes hierarchy.
-* **Flop Coding Styles**: Proper use of blocking (`=`) vs non-blocking (`<=`) assignments.
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-44-10" src="https://github.com/user-attachments/assets/5400cef4-c182-475f-9c31-74fb33fd0aa3" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-44-04" src="https://github.com/user-attachments/assets/e8c95460-9420-431f-aa97-e0b1a36b6683" />
+
+
+* Non-blocking assignments (`<=`) are **synthesis-friendly**
+* Single clock domain per always block avoids **race conditions**
+
+<br>
+
+**Other Flops:**
+
+<br>
+
+### 1. Async Set
+#### Simulation
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-31-36" src="https://github.com/user-attachments/assets/724aa368-9814-4195-b6c7-c282e9555a26" />
+
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-32-47" src="https://github.com/user-attachments/assets/6222f028-8425-4002-820b-610ec69a3c42" />
+
+<br>
+
+#### Synthesis
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-46-51" src="https://github.com/user-attachments/assets/7fd6d7fa-fa84-43af-bef0-7aefcab96caf" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-46-58" src="https://github.com/user-attachments/assets/beca812f-3e51-4779-936c-01b583ba8c98" />
+
+<br>
+### 2. Sync reset
+#### Simulation
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-35-34" src="https://github.com/user-attachments/assets/4cc44c40-1b70-4224-94d5-1f4d3b894b0e" />
+
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-36-03" src="https://github.com/user-attachments/assets/6a09b251-eda0-4fe2-ba66-82e127c22f8f" />
+
+
+<br>
+
+#### Synthesis
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-49-17" src="https://github.com/user-attachments/assets/c5075f41-d621-49fa-864b-4d4d99bcd414" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 15-49-05" src="https://github.com/user-attachments/assets/76d86017-a7a1-4ddf-b0ef-8f6afa206586" />
+
+
+<br>
+
+
+### 5️⃣ Interesting Optimizations – Part 1 🔧
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 16-45-28" src="https://github.com/user-attachments/assets/916a14e9-38dd-4564-ac12-04608e9c5d5d" />
+
+<br>
+
+**Example 1 – Multiply by 2**
+
+```verilog
+module mul2(input [2:0] a, output [3:0] y);
+    assign y = a * 2;
+endmodule
+```
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 17-08-39" src="https://github.com/user-attachments/assets/fd4d6a7d-1418-4169-8020-7829cecfebbb" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 17-15-24" src="https://github.com/user-attachments/assets/9c007047-00c2-45f8-8e25-11fa4f1be9e9" />
+
+<br>
+
+* Synthesis recognizes this as **left shift** → **no multiplier hardware needed**
+
+**Example 2 – Multiply by 9**
+
+```verilog
+module mult8(input [2:0] a, output [5:0] y);
+    assign y = a * 9;
+endmodule
+```
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 17-18-23" src="https://github.com/user-attachments/assets/44307340-5f9e-4fd9-8992-c66e59e73940" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-23 17-23-01" src="https://github.com/user-attachments/assets/3cb711df-4bf5-4d8a-8e84-8066d113e1b2" />
+
+
+<br>
+
+* Output is **concatenation trick (`aa`)** → efficient hardware
+* Synthesized netlist uses **shift + add optimization**
+
+<br>
+
+### ✅ Key Takeaways – Day 2
+
+* `.lib` files provide **timing, power, and area data** for synthesis
+* PVT corners ensure **robust designs** under real-world conditions
+* Hierarchical vs flat synthesis affects **optimization vs debug tradeoffs**
+* Proper **flop coding** prevents glitches and supports timing closure
+* RTL optimizations (multiply by constant powers) reduce **hardware usage**
+
 
 <br>
 
