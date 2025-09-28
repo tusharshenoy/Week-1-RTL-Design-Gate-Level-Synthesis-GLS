@@ -9,6 +9,7 @@
 </div>
 
 Welcome to **Week 1 of the RTL & Synthesis Workshop**! 🛠️
+
 This week, we dive into **Verilog RTL design**, **simulation with Icarus Verilog**, **waveform visualization with GTKWave**, and **logic synthesis with Yosys**.
 
 The workshop is structured **day-wise** for clarity:
@@ -20,8 +21,7 @@ The workshop is structured **day-wise** for clarity:
 | 📌 Day 3 | Combinational and Sequential Optimizations | [Go to Day 3](#day3) |
 | 📌 Day 4 | Gate-Level Simulation (GLS), Blocking vs Non-blocking, Synthesis-Simulation Mismatch | [Go to Day 4](#day4) |
 | 📌 Day 5 | Optimization in Synthesis | [Go to Day 5](#day5) |
-
-
+| 📌 Cheat Sheet | RTL Simulation & Synthesis Cheat Sheet | [Go to Day 5](#CheatSheet) |
 
 <br>
 
@@ -433,7 +433,7 @@ write_verilog -noattr good_mux_netlist.v
 **Key Observations:** 
 
 * Inputs/outputs remain unchanged → same testbench works for RTL & GLS.
-* * Netlist maps **gates & flip-flops** to the library cells.
+* Netlist maps **gates & flip-flops** to the library cells.
 
  <img width="1815" height="1080" alt="image" src="https://github.com/user-attachments/assets/0705de05-04fb-41fb-8fc5-9f57748f7a24" />
 
@@ -450,8 +450,6 @@ write_verilog -noattr good_mux_netlist.v
 <br>
 
 <h3 id="day2">📌 Day 2 – Timing Libraries, Hierarchical vs Flat Synthesis, Efficient Flop Coding Styles</h3>
-
-<br>
 
 ### 1️⃣ Understanding `.lib` Files 📚
 
@@ -795,8 +793,6 @@ endmodule
 <br>
 
 <h3 id="day3">📌 Day 3 – Combinational and Sequential Optimizations</h3>
-
-<br>
 
 ## 📖 Theory
 
@@ -2481,7 +2477,7 @@ endmodule
 
 * Each full adder instantiated using `generate`.
 * Carry chains properly connected → correct ripple-carry behavior.
-* 
+
 ### Simulation
 <br>
 
@@ -2516,6 +2512,35 @@ endmodule
 8.  Fine-tune library selection (fast/slow cells) for timing & area trade-offs.
 9.  Use Yosys passes (`abc`, `opt`, `flatten`) for final design efficiency.
 
+
+<h3 id="CheatSheet">📌 🖥️ RTL Simulation & Synthesis Cheat Sheet
+
+
+| Tool / Step                         | Command / Syntax                                                                                                   | Description / Notes                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| **Icarus Verilog – Compile**        | `iverilog design.v testbench.v`                                                                                    | Compile RTL and testbench. Generates `a.out`.                                          |
+| **Icarus Verilog – Run**            | `./a.out`                                                                                                          | Run simulation. Generates waveform `.vcd` file.                                        |
+| **GTKWave – View**                  | `gtkwave testbench.vcd`                                                                                            | Open waveform for debugging RTL signals.                                               |
+| **Icarus Verilog – With Libraries** | `iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v design_net.v tb_design.v` | Compile design with standard cell libraries for gate-level simulation.                 |
+| **Yosys – Launch**                  | `yosys`                                                                                                            | Invoke Yosys interactive shell.                                                        |
+| **Yosys – Read Library**            | `read_liberty -lib ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib`                                                | Load standard cell library for synthesis.                                              |
+| **Yosys – Read RTL**                | `read_verilog design.v`<br>`read_verilog design1.v design2.v topmodule.v`                                          | Read RTL source files.                                                                 |
+| **Yosys – Synthesize**              | `synth -top topmodule`                                                                                             | Synthesize the top module.                                                             |
+| **Yosys – Map Logic**               | `abc -liberty ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib`                                                     | Map logic to library cells.                                                            |
+| **Yosys – Map Flip-Flops**          | `dfflibmap -liberty ../my_lib/lib/sky130_fd_sc_hd__tt_025C_1v80.lib`                                               | Map sequential elements (flip-flops) to standard cells.                                |
+| **Yosys – Inspect Synthesis**       | `show`                                                                                                             | Visualize synthesized netlist (schematic view).                                        |
+| **Yosys – Write Netlist**           | `write_verilog design_net.v`<br>`write_verilog -noattr design_net.v`                                               | Export gate-level netlist. `-noattr` removes attributes for simpler netlist.           |
+| **Yosys – Flatten Hierarchy**       | `flatten`                                                                                                          | Flattens module hierarchy into a single top-level netlist.                             |
+| **Yosys – Prevent Purge**           | `opt_clean -nopurge`<br>`opt_clean -purge`                                                                         | `-nopurge`: Keep unused logic; `-purge`: remove unused cells/signals to clean netlist. |
+
+
+### ✅ Notes:
+
+* Always **compile and simulate RTL first** using Icarus + GTKWave to verify behavior before synthesis.
+* Keep design and testbench filenames **generic** (`design.v`, `tb_design.v`) for portability.
+* Use `flatten` when hierarchical netlist is not desired.
+* Use `-nopurge` if you want to retain unused logic for debugging or partial designs.
+* Use `-purge` to clean up netlist and remove redundant logic before final netlist writing.
 
 <br>
 
