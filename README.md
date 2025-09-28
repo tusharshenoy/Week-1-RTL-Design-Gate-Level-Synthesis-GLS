@@ -21,7 +21,7 @@ The workshop is structured **day-wise** for clarity:
 | 📌 Day 3 | Combinational and Sequential Optimizations | [Go to Day 3](#day3) |
 | 📌 Day 4 | Gate-Level Simulation (GLS), Blocking vs Non-blocking, Synthesis-Simulation Mismatch | [Go to Day 4](#day4) |
 | 📌 Day 5 | Optimization in Synthesis | [Go to Day 5](#day5) |
-| 📌 Cheat Sheet | RTL Simulation & Synthesis Cheat Sheet | [Go to Day 5](#CheatSheet) |
+| 📌 Cheat Sheet | RTL Simulation & Synthesis Cheat Sheet | [Go to Cheat Sheet](#CheatSheet) |
 
 <br>
 
