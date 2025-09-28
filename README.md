@@ -13,15 +13,19 @@ This week, we dive into **Verilog RTL design**, **simulation with Icarus Verilog
 
 The workshop is structured **day-wise** for clarity:
 
-* **Day 1** – Introduction to Verilog RTL Design & Synthesis
-* **Day 2** – Timing Libraries, Hierarchical vs Flat Synthesis, Efficient Flop Coding Styles
-* **Day 3** – Combinational and Sequential Optimizations
-* **Day 4** – Gate-Level Simulation (GLS), Blocking vs Non-blocking, Synthesis-Simulation Mismatch
-* **Day 5** – Optimization in Synthesis
+| Day / Section | Description | Link |
+| ------------- | ----------- | ---- |
+| 📌 Day 1 | Introduction to Verilog RTL Design & Synthesis | [Go to Day 1](#day1) |
+| 📌 Day 2 | Timing Libraries, Hierarchical vs Flat Synthesis, Efficient Flop Coding Styles | [Go to Day 2](#day2) |
+| 📌 Day 3 | Combinational and Sequential Optimizations | [Go to Day 3](#day3) |
+| 📌 Day 4 | Gate-Level Simulation (GLS), Blocking vs Non-blocking, Synthesis-Simulation Mismatch | [Go to Day 4](#day4) |
+| 📌 Day 5 | Optimization in Synthesis | [Go to Day 5](#day5) |
+
+
 
 <br>
 
-## 📌 Day 1 – Introduction to Verilog RTL Design & Synthesis
+<h3 id="day1">📌 Day 1 – Introduction to Verilog RTL Design & Synthesis</h3>
 
 ### 1️⃣ Core Concepts
 
@@ -445,7 +449,7 @@ write_verilog -noattr good_mux_netlist.v
 
 <br>
 
- ## 📌 Day 2 – Timing Libraries, Hierarchical vs Flat Synthesis, Flop Coding & RTL Optimizations
+<h3 id="day2">📌 Day 2 – Timing Libraries, Hierarchical vs Flat Synthesis, Efficient Flop Coding Styles</h3>
 
 <br>
 
@@ -790,7 +794,8 @@ endmodule
 
 <br>
 
-## 📌 Day 3 – Combinational & Sequential Optimizations 
+<h3 id="day3">📌 Day 3 – Combinational and Sequential Optimizations</h3>
+
 <br>
 
 ## 📖 Theory
@@ -1356,7 +1361,8 @@ endmodule
 
 <br>
 
-## 📌 Day 4 – GLS, Blocking vs Non-blocking & Simulation Mismatch 
+<h3 id="day4">📌 Day 4 – Gate-Level Simulation (GLS), Blocking vs Non-blocking, Synthesis-Simulation Mismatch</h3>
+
 
 ## 🔹 Introduction to GLS
 
@@ -1901,7 +1907,8 @@ endmodule
 
 <br>
 
-## 📌 Day 5 – Optimization in Synthesis 
+<h3 id="day5">📌 Day 5 – Optimization in Synthesis</h3>
+
 
 ## 🔹 1️⃣ If-Else Statements in Verilog
 
@@ -2139,21 +2146,17 @@ endmodule
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-46-11" src="https://github.com/user-attachments/assets/47e15e10-6de8-49f2-b141-62b902bdaaa0" />
 
-
-
 <br>
 
 ### Synthesis
+
 <br>
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-48-53" src="https://github.com/user-attachments/assets/6af7e0cf-be5d-43ea-ba0c-abd5596374a9" />
 
-
 <br>
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-48-43" src="https://github.com/user-attachments/assets/250e6a67-4ded-453f-950f-656321582e1a" />
-
-
 
 <br>
 
@@ -2172,7 +2175,6 @@ always @(*) begin
 end
 endmodule
 ```
-
 <br>
 
 ### Simulation
@@ -2186,7 +2188,6 @@ endmodule
 <img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-59-34" src="https://github.com/user-attachments/assets/63cb5dab-dd4a-4e0f-89d5-6e0c0ffbf8c9" />
 
 
-
 <br>
 
 ### Synthesis
@@ -2195,12 +2196,9 @@ endmodule
 <img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-51-43" src="https://github.com/user-attachments/assets/9837afb0-f094-4f70-8d69-f1ff312d4d36" />
 
 
-
 <br>
 
 <img width="1920" height="1080" alt="Screenshot from 2025-09-26 00-51-36" src="https://github.com/user-attachments/assets/93d909b1-0814-48c4-bae0-b8252062c1f5" />
-
-
 
 
 <br>
@@ -2208,31 +2206,109 @@ endmodule
 
 <br>
 
-## For Loops in Verilog
+## Lab 6: Bad Case Handling
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-13-50" src="https://github.com/user-attachments/assets/3c8e1187-0586-4cf0-b0fb-d648cda47b2f" />
 
-**Purpose:** Repeat statements; synthesizable if iteration count is fixed.
+<br>
 
-**Example: 4-to-1 MUX using loop**
+**Purpose:** Show how Bad cases can lead to unpredictable outputs.
 
 ```verilog
-module mux_4to1_for_loop (
-    input [3:0] data,
+module bad_case (
+    input i0, i1, i2, i3,
     input [1:0] sel,
     output reg y
 );
-integer i;
-always @(data, sel) begin
-    y = 1'b0;
-    for (i=0; i<4; i=i+1)
-        if (i == sel)
-            y = data[i];
+always @(*) begin
+    case(sel)
+        2'b00: y = i0;
+        2'b01: y = i1;
+        2'b10: y = i2;
+        2'b1?: y = i3; // Wildcard '?' is risky; incomplete cases may infer latch
+    endcase
 end
 endmodule
+```
+
+**Key Takeaway:** Avoid wildcards unless fully understood; always assign all outputs.
+
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-11-03" src="https://github.com/user-attachments/assets/cf77b208-50d7-4478-8ed5-0e3af760ae6b" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-10-57" src="https://github.com/user-attachments/assets/b6be831d-dbaf-49b8-8b73-1575f7cbc9ea" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-13-03" src="https://github.com/user-attachments/assets/be7962c4-0de9-421b-99b5-0a059733a074" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-12-57" src="https://github.com/user-attachments/assets/c1d1d811-2e25-4cc3-988f-892b1515378d" />
+
+
+
+<br>
+
+## For Loops in Verilog
+<br>
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/af328fbe-8f07-4d0a-9961-6b9574afe3e1" />
+
+<br>
+
+**Purpose:** Repeat statements; synthesizable if iteration count is fixed.
+
+**Lab 7: 4-to-1 MUX using loop**
+
+```verilog
+module mux_generate (input i0 , input i1, input i2 , input i3 , input [1:0] sel  , output reg y);
+wire [3:0] i_int;
+assign i_int = {i3,i2,i1,i0};
+integer k;
+always @ (*)
+begin
+for(k = 0; k < 4; k=k+1) begin
+	if(k == sel)
+		y = i_int[k];
+end
+end
+endmodule
+
 ```
 
 **Observation:**
 
 * Loop unrolled during synthesis → efficient MUX logic.
+
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 17-55-44" src="https://github.com/user-attachments/assets/6a27f1b4-6e95-4d52-97a0-e5cd5642c97a" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 17-53-54" src="https://github.com/user-attachments/assets/99a4b2fb-e33c-4fe5-80ec-3eb352fea660" />
+
+
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 17-56-38" src="https://github.com/user-attachments/assets/648137ea-2b8c-40d6-908b-14590336723c" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 17-56-30" src="https://github.com/user-attachments/assets/1ef57519-d694-4d5c-9e87-5652236b5614" />
 
 <br>
 
@@ -2253,9 +2329,126 @@ endgenerate
 
 **Use Case:** Scalable and synthesizable repetitive structures.
 
+
 <br>
 
-## Ripple Carry Adder (RCA) Using Generate Block
+## Lab 8: 8-to-1 Demux Using Case
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-20-46" src="https://github.com/user-attachments/assets/4fd0a2f3-a75d-4aab-9e27-60068adc3026" />
+
+<br>
+
+**Purpose:** Show demux implementation with case statement.
+
+```verilog
+module demux_case (
+    output o0,o1,o2,o3,o4,o5,o6,o7,
+    input [2:0] sel,
+    input i
+);
+reg [7:0] y_int;
+assign {o7,o6,o5,o4,o3,o2,o1,o0} = y_int;
+
+always @(*) begin
+    y_int = 8'b0; // Default output
+    case(sel)
+        3'b000: y_int[0] = i;
+        3'b001: y_int[1] = i;
+        3'b010: y_int[2] = i;
+        3'b011: y_int[3] = i;
+        3'b100: y_int[4] = i;
+        3'b101: y_int[5] = i;
+        3'b110: y_int[6] = i;
+        3'b111: y_int[7] = i;
+    endcase
+end
+endmodule
+```
+
+**Key Takeaway:** Case-based demux is clear and easy to synthesize.
+
+### Simulation
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-19-08" src="https://github.com/user-attachments/assets/b01d0eeb-ffd3-4440-97e4-60550ed5a14b" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-18-57" src="https://github.com/user-attachments/assets/2aaebd8d-a3ee-4eef-b2f8-d8a353230f38" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-20-14" src="https://github.com/user-attachments/assets/3514bbcf-9b50-48c8-99ca-f99bb2cdfa83" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-20-07" src="https://github.com/user-attachments/assets/66641044-4ffc-4619-bdbb-d71fcd1e6121" />
+
+<br>
+
+## Lab 9: 8-to-1 Demux Using For Loop
+
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-25-51" src="https://github.com/user-attachments/assets/bed55975-4cc6-4149-a8fe-cc70c530e0ab" />
+<br>
+
+**Purpose:** Scalable demux using iterative approach.
+
+```verilog
+module demux_generate (
+    output o0,o1,o2,o3,o4,o5,o6,o7,
+    input [2:0] sel,
+    input i
+);
+reg [7:0] y_int;
+assign {o7,o6,o5,o4,o3,o2,o1,o0} = y_int;
+
+integer k;
+always @(*) begin
+    y_int = 8'b0; // Default output
+    for (k = 0; k < 8; k=k+1) begin
+        if (k == sel)
+            y_int[k] = i;
+    end
+end
+endmodule
+```
+
+**Key Takeaway:** For loops + default assignments → safe, scalable logic.
+
+### Simulation
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-23-45" src="https://github.com/user-attachments/assets/69aee4d3-741a-4cf4-adb8-c3837d01528e" />
+
+
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-23-36" src="https://github.com/user-attachments/assets/ad32740b-0db7-4177-ba5b-dd7064ea20fb" />
+
+<br>
+
+### Synthesis
+<br>
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8c3c46a7-07c4-449f-88cf-3f1149a81ad4" />
+
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-25-06" src="https://github.com/user-attachments/assets/b74f1be0-bf84-4dd9-bf55-0cf46ad0de3d" />
+
+<br>
+
+
+
+## Lab 10: Ripple Carry Adder (RCA) Using Generate Block
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-28-26" src="https://github.com/user-attachments/assets/ea1301e8-846e-41d9-a19e-08a9a88005b0" />
+
+<br>
 
 ```verilog
 module fa (input a,b,c, output co,sum);
@@ -2288,8 +2481,28 @@ endmodule
 
 * Each full adder instantiated using `generate`.
 * Carry chains properly connected → correct ripple-carry behavior.
+* 
+### Simulation
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-30-19" src="https://github.com/user-attachments/assets/9c48474e-8f6d-4b9d-907d-9c52bf53214f" />
 
 <br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-30-04" src="https://github.com/user-attachments/assets/e1219c40-d19f-4430-9556-3e3773a5dcfe" />
+
+<br>
+
+### Synthesis
+<br>
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-35-38" src="https://github.com/user-attachments/assets/099f6596-1973-4dfb-aa3e-0de6e17bdff8" />
+
+<br>
+
+<img width="1920" height="1080" alt="Screenshot from 2025-09-27 18-35-26" src="https://github.com/user-attachments/assets/31bb3399-c996-400b-a268-a2cc533a0f5c" />
+
+<br>
+
 
 ### ✅ Key Takeaways – Day 4
 
@@ -2307,7 +2520,10 @@ endmodule
 <br>
 
 **Author & Repository**
+
 **Author:** T Tushar Shenoy
+
 **Repository:** Week-1-RTL-Design-Gate-Level-Synthesis-GLS
+
 **Program:** VLSI System Design (VSD)
 
