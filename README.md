@@ -2198,6 +2198,7 @@ endmodule
 
 
 <br>
+
 **Lesson:** Always assign **all outputs in all case branches**; use `default` to avoid latches.
 
 <br>
